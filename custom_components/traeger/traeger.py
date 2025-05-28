@@ -226,8 +226,8 @@ class traeger:
             grill_id = grill["thingName"]
             if grill_id in self.grill_status:
                 del self.grill_status[grill_id]
-            #self.update_state(grill_id)
-            self.hass.async_create_task(self.update_state(grill_id))
+            self.update_state(grill_id)
+            #self.hass.async_create_task(self.update_state(grill_id))
     def mqtt_onmessage(self, client, userdata, message):
         _LOGGER.debug("grill_message: message.topic = %s, message.payload = %s", message.topic, message.payload)
         _LOGGER.info(f"Token Time Remaining:{self.token_remaining()} MQTT Time Remaining:{self.mqtt_url_remaining()}")
@@ -295,11 +295,11 @@ class traeger:
     def get_units_for_device(self, thingName):
         state = self.get_state_for_device(thingName)
         if state is None:
-            return homeassistant.const.TEMP_FAHRENHEIT
+            return homeassistant.const.UnitOfTemperature.FAHRENHEIT
         if state["units"] == 0:
-            return homeassistant.const.TEMP_CELSIUS
+            return homeassistant.const.UnitOfTemperature.CELSIUS
         else:
-            return homeassistant.const.TEMP_FAHRENHEIT
+            return homeassistant.const.UnitOfTemperature.FAHRENHEIT
 
     def get_details_for_accessory(self, thingName, accessory_id):
         state = self.get_state_for_device(thingName)
@@ -326,7 +326,7 @@ class traeger:
         if self.mqtt_url_remaining() < 60:
             self.mqtt_thread_refreshing = True
             if self.mqtt_thread_running:
-                self.mqtt_client.disconnect()
+                #self.mqtt_client.disconnect()
                 self.mqtt_client = None
             await self.get_mqtt_client()
             self.mqtt_thread_refreshing = False
